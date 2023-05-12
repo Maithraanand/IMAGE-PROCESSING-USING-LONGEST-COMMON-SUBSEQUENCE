@@ -1,0 +1,65 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_PIXELS 1000 // maximum number of pixels in an image
+
+// function to compare two images using LCS
+float compare_images(int img1[], int img2[], int rows, int cols) {
+    int i, j, k;
+    int lcs[rows+1][cols+1];
+
+    // initialize LCS matrix
+    for(i=0; i<=rows; i++) {
+        for(j=0; j<=cols; j++) {
+            if(i==0 || j==0) {
+                lcs[i][j] = 0;
+            }
+            else if(img1[(i-1)*cols+j-1] == img2[(i-1)*cols+j-1]) {
+                lcs[i][j] = lcs[i-1][j-1] + 1;
+            }
+            else {
+                lcs[i][j] = (lcs[i-1][j] > lcs[i][j-1]) ? lcs[i-1][j] : lcs[i][j-1];
+            }
+        }
+    }
+
+    // compute similarity score as percentage of pixels in common
+    float similarity = (float)(lcs[rows][cols]) / (float)(rows*cols) * 100.0;
+    return similarity;
+}
+
+int main() {
+    int img1[MAX_PIXELS], img2[MAX_PIXELS];
+    int rows, cols, i, j, pixel;
+
+    // read in first image
+    printf("Enter number of rows and columns in first image: ");
+    scanf("%d %d", &rows, &cols);
+
+    printf("Enter pixels for first image:\n");
+    for(i=0; i<rows; i++) {
+        for(j=0; j<cols; j++) {
+            scanf("%d", &pixel);
+            img1[i*cols+j] = pixel;
+        }
+    }
+
+    // read in second image
+    printf("Enter number of rows and columns in second image: ");
+    scanf("%d %d", &rows, &cols);
+
+    printf("Enter pixels for second image:\n");
+    for(i=0; i<rows; i++) {
+        for(j=0; j<cols; j++) {
+            scanf("%d", &pixel);
+            img2[i*cols+j] = pixel;
+        }
+    }
+
+    // compare images and print similarity score
+    float similarity = compare_images(img1, img2, rows, cols);
+    printf("Similarity between images is: %.2f%%\n", similarity);
+
+    return 0;
+}
